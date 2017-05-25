@@ -3,6 +3,7 @@ package com.expansion.lg.kimaru.lggpscollector;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import com.google.gson.Gson;
 
 import java.util.HashMap;
 
@@ -28,6 +29,7 @@ public class SessionManagement {
     public static final String KEY_CHP_ID = "chp_id";
     public static final String KEY_CHP_PHONE = "chp_phone";
     public static final String KEY_CHP_COUNTRY = "chp_country";
+    public static final String KEY_GPSDATA = "gps";
 
 
 
@@ -99,6 +101,22 @@ public class SessionManagement {
 
         //commit / Save the values
 
+        editor.commit();
+    }
+
+    public GpsData getSavedGpsData (){
+
+        GpsData gpsData;
+        Gson gson = new Gson();
+        String gpsDetails = pref.getString(KEY_GPSDATA, "");
+        gpsData = gson.fromJson(gpsDetails, GpsData.class);
+        return gpsData;
+    }
+
+    public void saveGpsData(GpsData gps){
+        Gson gson = new Gson();
+        String gpsObject = gson.toJson(gps);
+        editor.putString(KEY_GPSDATA, gpsObject);
         editor.commit();
     }
 

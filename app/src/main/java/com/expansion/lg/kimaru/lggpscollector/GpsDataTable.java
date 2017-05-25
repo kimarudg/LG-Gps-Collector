@@ -142,7 +142,7 @@ public class GpsDataTable extends SQLiteOpenHelper {
             gpsData.setCountry(cursor.getString(8));
             gpsData.setDateAdded(cursor.getLong(9));
             gpsData.setLatitude(cursor.getDouble(10));
-            gpsData.setLatitude(cursor.getDouble(11));
+            gpsData.setLongitude(cursor.getDouble(11));
 
             gpsDataList.add(gpsData);
         }

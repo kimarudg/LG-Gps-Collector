@@ -109,6 +109,7 @@ public class HomeFragment extends Fragment  {
         //session Management
         session = new SessionManagement(getContext());
         user = session.getUserDetails();
+        MainActivity.backFragment = null;
 
         // ============Gmail View starts here =======================
         // Gmail View.
@@ -129,6 +130,7 @@ public class HomeFragment extends Fragment  {
 
                 NewGpsDataFragment newGpsDataFragment = new NewGpsDataFragment();
                 newGpsDataFragment.editingGps = gpsData;
+                session.saveGpsData(gpsData);
 
                 Fragment fragment = newGpsDataFragment;
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -141,6 +143,7 @@ public class HomeFragment extends Fragment  {
             public void onIconImportantClicked(int position) {
                 //when you click ka-macho, it sould open for you the details of the gpsData
                 GpsData gpsData = gpsDatas.get(position);
+                session.saveGpsData(gpsData);
                 Fragment fragment = new GpsDataViewFragment();
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -152,8 +155,7 @@ public class HomeFragment extends Fragment  {
             public void onMessageRowClicked(int position) {
                 // go to view the gpsData
                 GpsData gpsData = gpsDatas.get(position);
-
-                //Fragment fragment = new RegistrationsFragment();
+                session.saveGpsData(gpsData);
                 Fragment fragment = new GpsDataViewFragment();
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -167,6 +169,7 @@ public class HomeFragment extends Fragment  {
 
                 //extract the clicked gpsData
                 GpsData gpsData = gpsDatas.get(position);
+                session.saveGpsData(gpsData);
                 Fragment fragment;
                 NewGpsDataFragment newGpsDataFragment = new NewGpsDataFragment();
                 newGpsDataFragment.editingGps = gpsData;

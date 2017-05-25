@@ -137,6 +137,7 @@ public class NewGpsDataFragment extends Fragment implements View.OnClickListener
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.new_gps_fragment, container, false);
+        MainActivity.backFragment = new HomeFragment();
         countries.add("KE");
         countries.add("UG");
         //Initialize the UI Components
