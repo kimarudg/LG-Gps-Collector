@@ -1,14 +1,24 @@
 package com.expansion.lg.kimaru.lggpscollector;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -16,12 +26,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +75,13 @@ public class HomeFragment extends Fragment  {
     SessionManagement session;
     HashMap<String, String> user;
 
+    private static final int PERMISSION_CALLBACK_CONSTANT = 101;
+    private static final int REQUEST_PERMISSION_SETTING = 102;
+    String[] permissionsRequired = new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION};
+    private SharedPreferences permissionStatus;
+    private boolean sentToSettings = false;
 
     // I cant seem to get the context working
     Context mContext = getContext();
@@ -92,6 +113,7 @@ public class HomeFragment extends Fragment  {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -104,6 +126,7 @@ public class HomeFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        setHasOptionsMenu(true);
         View v =  inflater.inflate(R.layout.fragment_datum, container, false);
         textshow = (TextView) v.findViewById(R.id.textShow);
         //session Management
@@ -309,19 +332,23 @@ public class HomeFragment extends Fragment  {
         }
     }
 
-    // deleting the messages from recycler view
-    private void deleteMessages() {
-        rAdapter.resetAnimationIndex();
-        List<Integer> selectedItemPositions =
-                rAdapter.getSelectedItems();
-        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
-            rAdapter.removeData(selectedItemPositions.get(i));
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Fragment fragment;
+        FragmentTransaction fragmentTransaction;
+        switch (item.getItemId()) {
+            // action with ID action_refresh was selected
+            case R.id.action_export:
+                // export scoring tool
+                Toast.makeText(getContext(), "Exporting the CSV file", Toast.LENGTH_SHORT).show();
+                checkPermissions();
+                break;
         }
-        rAdapter.notifyDataSetChanged();
+        return true;
     }
+
     private void getGpsDatas() {
         swipeRefreshLayout.setRefreshing(true);
-
         gpsDatas.clear();
 
         // clear the registrations
@@ -343,7 +370,190 @@ public class HomeFragment extends Fragment  {
         }
         swipeRefreshLayout.setRefreshing(false);
     }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+        inflater.inflate(R.menu.collection, menu);
+    }
 
-    //====================================== End Gmail Methods======================================
+    public void checkPermissions(){
+        try{
+            if(ActivityCompat.checkSelfPermission(getContext(), permissionsRequired[0]) != PackageManager.PERMISSION_GRANTED){
+                if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),permissionsRequired[0])){
+                    //Show Information about why you need the permission
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Multiple Permissions Request");
+                    builder.setMessage("This app needs Location permissions");
+                    builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            ActivityCompat.requestPermissions(getActivity(),permissionsRequired, PERMISSION_CALLBACK_CONSTANT);
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builder.show();
+                }else if (permissionStatus.getBoolean(permissionsRequired[0], false)){
+                    //Previously Permission Request was cancelled with 'Dont Ask Again',
+                    // Redirect to Settings after showing Information about why you need the permission
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Multiple Permissions Request");
+                    builder.setMessage("This app needs Location permissions");
+                    builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            sentToSettings = true;
+                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            Uri uri = Uri.fromParts("package", getContext().getPackageName(), null);
+                            intent.setData(uri);
+                            startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
+                            Toast.makeText(getContext(), "Go to Permissions to Grant Location Permissions",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builder.show();
+                }else {
+                    ActivityCompat.requestPermissions(getActivity(), permissionsRequired, PERMISSION_CALLBACK_CONSTANT);
+                }
+                SharedPreferences.Editor editor = permissionStatus.edit();
+                editor.putBoolean(permissionsRequired[0],true);
+                editor.commit();
+            }else{
+                proceedAfterPermission();
+            }
+        }catch (Exception e){}
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == PERMISSION_CALLBACK_CONSTANT){
+            //check if all permissions are granted
+            boolean allgranted = false;
+            for(int i=0;i<grantResults.length;i++){
+                if(grantResults[i]==PackageManager.PERMISSION_GRANTED){
+                    allgranted = true;
+                } else {
+                    allgranted = false;
+                    break;
+                }
+            }
+
+            if(allgranted){
+                proceedAfterPermission();
+            } else if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),permissionsRequired[0])){
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Need Multiple Permissions");
+                builder.setMessage("This app needs Location permissions.");
+                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        ActivityCompat.requestPermissions(getActivity(),permissionsRequired,PERMISSION_CALLBACK_CONSTANT);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            } else {
+                Toast.makeText(getContext(),"Unable to get Permission",Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_PERMISSION_SETTING) {
+            if (ActivityCompat.checkSelfPermission(getContext(), permissionsRequired[0]) == PackageManager.PERMISSION_GRANTED) {
+                //Got Permission
+                proceedAfterPermission();
+            }
+        }
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (sentToSettings) {
+            if (ActivityCompat.checkSelfPermission(getContext(), permissionsRequired[0]) == PackageManager.PERMISSION_GRANTED) {
+                //Got Permission
+                proceedAfterPermission();
+            }
+        }
+    }
+    private void proceedAfterPermission() {
+        exportCollections();
+    }
+
+
+    private void exportCollections(){
+        String state = Environment.getExternalStorageState();
+        if(!Environment.MEDIA_MOUNTED.equals(state)){
+            return;
+        }else{
+            //We used Download Dir
+            File exportDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            if(!exportDir.exists()){
+                exportDir.mkdirs();
+            }
+            File file;
+            PrintWriter printWriter = null;
+            file = new File(exportDir, "LG_GPS_Collections.csv");
+            try {
+                file.createNewFile();
+                printWriter = new PrintWriter(new FileWriter(file));
+
+                //here we get the cursor that contains our records
+                GpsDataTable gpsDataTable = new GpsDataTable(getContext());
+                String header = "CHP Name," +
+                        "CHP Phone," +
+                        "CHP UUID," +
+                        "Country," +
+                        "Record UUID," +
+                        "Record LAT," +
+                        "Record LON," +
+                        "Added By," +
+                        "Phone," +
+                        "Email," +
+                        "Date Added";
+                printWriter.println(header);
+                for (GpsData gpsData : gpsDatas){
+                    String strData = gpsData.getChpName() +","+
+                            gpsData.getChpPhone() +","+
+                            gpsData.getChpUuid() +","+
+                            gpsData.getCountry() +","+
+                            gpsData.getChpRecorduuid() +","+
+                            gpsData.getLatitude() +","+
+                            gpsData.getLongitude() +","+
+                            gpsData.getSupervisorName() +","+
+                            gpsData.getSupervisoPhone() +","+
+                            gpsData.getSupervisorEmail() + ","+
+                            new DisplayDate(gpsData.getDateAdded()).dateAndTime();
+                    printWriter.println(strData);
+                }
+            } catch (Exception e){
+                Toast.makeText(getContext(), "Error occured "+ e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+            finally {
+                if(printWriter != null) printWriter.close();
+            }
+            Toast.makeText(getContext(), "Collection exported to "+ file.getAbsolutePath() +" Folder", Toast.LENGTH_LONG).show();
+        }
+
+    }
 
 }

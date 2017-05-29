@@ -95,7 +95,12 @@ public class GpsDataListAdapter extends RecyclerView.Adapter<GpsDataListAdapter.
         holder.timestamp.setText(String.valueOf(gpsData.getLongitude()));
 
         // displaying the first letter of From in icon text
-        holder.iconText.setText(gpsData.getChpName().substring(0,1));
+        if (gpsData.getChpName().equals("") || gpsData.getChpName() == null){
+            holder.iconText.setText("LG");
+        }else{
+            holder.iconText.setText(gpsData.getChpName().substring(0,1));
+        }
+
 
         // change the row state to activated
         holder.itemView.setActivated(selectedItems.get(position, false));
