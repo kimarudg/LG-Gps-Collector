@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpPost;
@@ -27,7 +28,7 @@ import java.util.TimerTask;
 
 public class HttpClient {
     Context context;
-    private static String url ="http://lg-apps.com:8010/mmsms/transactions/add";
+    private static String url ="https://expansion.lg-apps.com/api/v1/sync/gpsdata";
 
     public HttpClient(Context context){
         this.context = context;
@@ -38,30 +39,40 @@ public class HttpClient {
     public String postGPSData() throws Exception {
         String postResults = "";
         GpsDataTable gpsDataTable = new GpsDataTable(context);
-        List<GpsData> gpsDataList = gpsDataTable.getGpsData();
-        for (GpsData gps : gpsDataList){
-            JSONObject gpsJson = new JSONObject();
-            gpsJson.put("tag", "gps_visit");
-            gpsJson.put(GpsDataTable.UUID, gps.getUuid());
-            gpsJson.put(GpsDataTable.CHP_PHONE, gps.getChpPhone());
-            gpsJson.put(GpsDataTable.REFERENCE_ID, gps.getReferenceId());
-            gpsJson.put(GpsDataTable.COUNTRY, gps.getCountry());
-            gpsJson.put(GpsDataTable.DATE_ADDED, gps.getDateAdded());
-            gpsJson.put(GpsDataTable.LATITUDE, gps.getLatitude());
-            gpsJson.put(GpsDataTable.LONGITUDE, gps.getLongitude());
-            gpsJson.put(GpsDataTable.GPS_ON, gps.isGpsOn());
-            gpsJson.put(GpsDataTable.ACTIVITY_TYPE, gps.getActivityType());
-            gpsJson.put(GpsDataTable.TIME_TO_RESOLVE, gps.getApproximateTimeToResolve());
-            try {
-                postResults = this.ApiClient(gpsJson, "", url);
-                Log.d("Testing", postResults);
-                Log.d("RESULTS : Sync", "");
-                Log.d("API  : Url", url);
-            }catch (Exception e){
-                Log.d("ERROR : Sync", e.getMessage());
-                postResults = null;
-            }
+
+        try {
+            postResults = this.ApiClient(gpsDataTable.getGpsDataAsJson(),
+                    GpsDataTable.JSON_ROOT, url);
+        } catch (Exception e){
+            Log.d("ERROR : Sync Recs", e.getMessage());
+            postResults = null;
         }
+
+
+//        List<GpsData> gpsDataList = gpsDataTable.getGpsData();
+//        for (GpsData gps : gpsDataList){
+//            JSONObject gpsJson = new JSONObject();
+//            gpsJson.put("tag", "gps_visit");
+//            gpsJson.put(GpsDataTable.UUID, gps.getUuid());
+//            gpsJson.put(GpsDataTable.CHP_PHONE, gps.getChpPhone());
+//            gpsJson.put(GpsDataTable.REFERENCE_ID, gps.getReferenceId());
+//            gpsJson.put(GpsDataTable.COUNTRY, gps.getCountry());
+//            gpsJson.put(GpsDataTable.DATE_ADDED, gps.getDateAdded());
+//            gpsJson.put(GpsDataTable.LATITUDE, gps.getLatitude());
+//            gpsJson.put(GpsDataTable.LONGITUDE, gps.getLongitude());
+//            gpsJson.put(GpsDataTable.GPS_ON, gps.isGpsOn());
+//            gpsJson.put(GpsDataTable.ACTIVITY_TYPE, gps.getActivityType());
+//            gpsJson.put(GpsDataTable.TIME_TO_RESOLVE, gps.getApproximateTimeToResolve());
+//            try {
+//                postResults = this.ApiClient(gpsJson, "", url);
+//                Log.d("Testing", postResults);
+//                Log.d("RESULTS : Sync", "");
+//                Log.d("API  : Url", url);
+//            }catch (Exception e){
+//                Log.d("ERROR : Sync", e.getMessage());
+//                postResults = null;
+//            }
+//        }
         return postResults;
     }
 
@@ -70,10 +81,9 @@ public class HttpClient {
         //  get the server URL
         AsyncHttpPost p = new AsyncHttpPost(url);
         p.setBody(new JSONObjectBody(json));
-        //JSONObject ret = AsyncHttpClient.getDefaultInstance().executeJSONObject(p, null).get();
-        //return ret.toString();
-        String status = AsyncHttpClient.getDefaultInstance().executeString(p, null).get();
-        return status;
+        JSONObject ret = AsyncHttpClient.getDefaultInstance().executeJSONObject(p, null).get();
+        return ret.toString();
+
     }
 
 
@@ -87,16 +97,14 @@ public class HttpClient {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        String registrationUrl;
                         //registrations
-                        registrationUrl = url;
-                        new ProcessGpsData().execute(registrationUrl);
-                        //Poll server for new records
+                        new ProcessGpsData().execute(url);
                     }
                 });
             }
         };
-        timer.schedule(task, 0, 60*500);
+        timer.schedule(task, 0, 60 * 1000);
+        // timer.schedule(task, 0, 60*1000);
     }
 
     private class ProcessGpsData extends AsyncTask<String, Void, String> {
@@ -113,7 +121,7 @@ public class HttpClient {
 
         protected void onPostExecute(String stream){
             if(stream !=null){
-
+                Toast.makeText(context, "Posted the record", Toast.LENGTH_SHORT).show();
             }
         }
     }

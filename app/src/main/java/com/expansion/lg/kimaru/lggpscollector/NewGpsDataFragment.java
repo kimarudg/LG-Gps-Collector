@@ -199,7 +199,7 @@ public class NewGpsDataFragment extends Fragment implements View.OnClickListener
                 // set date as integers
 
                 String chpPhone = mChpPhone.getText().toString();
-                String referenceId = mChpRecordUuid.getText().toString();
+                String referenceId = mChpRecordUuid.getText().toString().toLowerCase();
                 String country = countries.get(mCountry.getSelectedItemPosition());
                 String activity = activityType.get(mActivityType.getSelectedItemPosition());
                 String timeResolve = timess.get(mTimeToResolve.getSelectedItemPosition());
