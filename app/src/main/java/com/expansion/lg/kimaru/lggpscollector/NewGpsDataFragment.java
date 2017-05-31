@@ -34,6 +34,7 @@ import org.w3c.dom.Text;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -66,9 +67,8 @@ public class NewGpsDataFragment extends Fragment implements View.OnClickListener
 
     private OnFragmentInteractionListener mListener;
 
-    EditText mChpName, mChpPhone, mChpUuid, mChpRecordUuid, mSupervisorName,
-            mSupervisorPhone, mSupervisorEmail;
-    Spinner mCountry;
+    EditText mChpPhone, mChpRecordUuid;
+    Spinner mCountry, mActivityType, mTimeToResolve, mGpsOn;
 
     Button buttonSave, buttonList;
 
@@ -99,6 +99,9 @@ public class NewGpsDataFragment extends Fragment implements View.OnClickListener
     SessionManagement sessionManagement;
     HashMap<String, String> user;
     List<String> countries = new ArrayList<>();
+    List<String> activityType = new ArrayList<>();
+    List<String> timess = new ArrayList<>();
+    List<String> yesno = new ArrayList<>();
 
 
     public NewGpsDataFragment() {
@@ -138,28 +141,28 @@ public class NewGpsDataFragment extends Fragment implements View.OnClickListener
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.new_gps_fragment, container, false);
         MainActivity.backFragment = new HomeFragment();
-        countries.add("KE");
-        countries.add("UG");
+        countries = Arrays.asList(getResources().getStringArray(R.array.selectCountries));
+        activityType = Arrays.asList(getResources().getStringArray(R.array.activityType));
+        timess = Arrays.asList(getResources().getStringArray(R.array.times));
+        yesno = Arrays.asList(getResources().getStringArray(R.array.yesno));
+
         //Initialize the UI Components
+        //EditText mChpPhone, mChpRecordUuid;
+        // Spinner mCountry, mActivityType, mTimeToResolve;
         editGpsLocation = (TextView) v.findViewById(R.id.editGpsLocation);
-        mChpName = (EditText) v.findViewById(R.id.editChpName);
         mChpPhone = (EditText) v.findViewById(R.id.editChpPhone);
-        mChpUuid = (EditText) v.findViewById(R.id.editChpUuid);
         mChpRecordUuid = (EditText) v.findViewById(R.id.editChpRecordUuid);
-        mSupervisorName = (EditText) v.findViewById(R.id.editSupervisorName);
-        mSupervisorPhone = (EditText) v.findViewById(R.id.editSupervisorPhone);
-        mSupervisorEmail = (EditText) v.findViewById(R.id.editSupervisorEmail);
         mCountry = (Spinner) v.findViewById(R.id.selectCountries);
+        mActivityType = (Spinner) v.findViewById(R.id.selectActivityType);
+        mTimeToResolve = (Spinner) v.findViewById(R.id.selectTimeToResolve);
+        mGpsOn = (Spinner) v.findViewById(R.id.selectGpsOn);
+
 
         sessionManagement = new SessionManagement(getContext());
         user = sessionManagement.getUserDetails();
         //to reduce repetition
-        mChpName.setText(sessionManagement.getChpDetails().get(SessionManagement.KEY_CHP_NAME));
         mChpPhone.setText(sessionManagement.getChpDetails().get(SessionManagement.KEY_CHP_PHONE));
-        mChpUuid.setText(sessionManagement.getChpDetails().get(SessionManagement.KEY_CHP_ID));
-        mSupervisorName.setText(sessionManagement.getChpDetails().get(SessionManagement.KEY_USER_NAME));
-        mSupervisorPhone.setText(sessionManagement.getChpDetails().get(SessionManagement.KEY_USER_PHONE));
-        mSupervisorEmail.setText(sessionManagement.getChpDetails().get(SessionManagement.KEY_USER_EMAIL));
+
 
         setUpEditingMode();
         buttonList = (Button) v.findViewById(R.id.buttonList);
@@ -194,17 +197,13 @@ public class NewGpsDataFragment extends Fragment implements View.OnClickListener
 
             case R.id.buttonSave:
                 // set date as integers
-                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
-                String chpName = mChpName.getText().toString();
                 String chpPhone = mChpPhone.getText().toString();
-                String chpUuid = mChpUuid.getText().toString();
-                String chpRecordUuid = mChpRecordUuid.getText().toString();
-                String supervisorName = mSupervisorName.getText().toString();
-                String supervisorPhone = mSupervisorPhone.getText().toString();
-                String supervisorEmail = mSupervisorEmail.getText().toString();
+                String referenceId = mChpRecordUuid.getText().toString();
                 String country = countries.get(mCountry.getSelectedItemPosition());
-
+                String activity = activityType.get(mActivityType.getSelectedItemPosition());
+                String timeResolve = timess.get(mTimeToResolve.getSelectedItemPosition());
+                boolean gpsOn = yesno.get(mGpsOn.getSelectedItemPosition()).equalsIgnoreCase("Yes");
 
                 Long currentDate =  new Date().getTime();
                 String uuid;
@@ -216,69 +215,28 @@ public class NewGpsDataFragment extends Fragment implements View.OnClickListener
 
 
                 // Do some validations
-                /*
-                if (chpName.trim().equals("")){
-                    Toast.makeText(getContext(), "Enter the CHP Name", Toast.LENGTH_SHORT).show();
-                    mChpName.requestFocus();
-                    return;
-                }
+
                 if (chpPhone.trim().equals("")){
                     Toast.makeText(getContext(), "Enter the CHP Phone", Toast.LENGTH_SHORT).show();
                     mChpPhone.requestFocus();
                     return;
                 }
-                if (chpUuid.trim().equals("")){
-                    Toast.makeText(getContext(), "Enter the CHP UUID", Toast.LENGTH_SHORT).show();
-                    mChpUuid.requestFocus();
-                    return;
-                } */
 
-                /*if (supervisorName.trim().equals("")){
-                    Toast.makeText(getContext(), "Enter the Name of the supervisor", Toast.LENGTH_SHORT).show();
-                    mSupervisorName.requestFocus();
-                    return;
-                }
-                if (supervisorPhone.trim().equals("")){
-                    Toast.makeText(getContext(), "Enter the phone of the supervisor", Toast.LENGTH_SHORT).show();
-                    mSupervisorPhone.requestFocus();
-                    return;
-                }
-                if (supervisorEmail.trim().equals("")){
-                    Toast.makeText(getContext(), "Enter the Email of the supervisor", Toast.LENGTH_SHORT).show();
-                    mSupervisorEmail.requestFocus();
-                    return;
-                }
-
-                if (supervisorPhone.trim().equals(chpPhone)){
-                    Toast.makeText(getContext(), "The supervisor name and CHP phone can't be the same", Toast.LENGTH_SHORT).show();
-                    mSupervisorPhone.requestFocus();
-                    return;
-                }
-
-
-                if (!chpUuid.matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")) {
-                    Toast.makeText(getContext(), "Enter a valid UUID for CHP UUID", Toast.LENGTH_SHORT).show();
-                    mChpUuid.requestFocus();
-                    return;
-                }
-                */
-
-                if (chpRecordUuid.trim().equals("")){
+                if (referenceId.trim().equals("")){
                     Toast.makeText(getContext(), "Enter the CHP Record UUID", Toast.LENGTH_SHORT).show();
                     mChpRecordUuid.requestFocus();
                     return;
                 }
-                if (!chpRecordUuid.matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")) {
+                if (!referenceId.matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")) {
                     Toast.makeText(getContext(), "Enter a valid UUID for CHP Record", Toast.LENGTH_SHORT).show();
                     mChpRecordUuid.requestFocus();
                     return;
                 }
-                sessionManagement.createChpDetails(chpUuid, chpName, chpPhone,country);
-                sessionManagement.createSupervisorDetails(supervisorName, supervisorEmail, supervisorPhone, country);
+
                 // Save the record
-                GpsData gpsData = new GpsData(uuid, chpName, chpPhone, chpUuid, chpRecordUuid,
-                        supervisorName, supervisorPhone, supervisorEmail,currentDate,
-                        latitude, longitude, country.toString());
+                GpsData gpsData = new GpsData(uuid, chpPhone, referenceId, country,
+                        currentDate, gpsOn, activity,
+                        latitude, longitude, timeResolve);
 
 
                 GpsDataTable gpsDataTable = new GpsDataTable(getContext());
@@ -289,7 +247,6 @@ public class NewGpsDataFragment extends Fragment implements View.OnClickListener
                 }
                 else{
                     Toast.makeText(getContext(), "Saved successfully", Toast.LENGTH_SHORT).show();
-
                     fragment = new HomeFragment();
                     fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
@@ -570,13 +527,8 @@ public class NewGpsDataFragment extends Fragment implements View.OnClickListener
 
         if (editingGps != null){
 
-            mChpName.setText(editingGps.getChpName());
             mChpPhone.setText(editingGps.getChpPhone());
-            mChpUuid.setText(editingGps.getChpUuid());
-            mChpRecordUuid.setText(editingGps.getChpRecorduuid());
-            mSupervisorName.setText(editingGps.getSupervisorName());
-            mSupervisorPhone.setText(editingGps.getSupervisoPhone());
-            mSupervisorEmail.setText(editingGps.getSupervisorEmail());
+            mChpRecordUuid.setText(editingGps.getReferenceId());
             //mCountry
         }
     }

@@ -519,30 +519,26 @@ public class HomeFragment extends Fragment  {
 
                 //here we get the cursor that contains our records
                 GpsDataTable gpsDataTable = new GpsDataTable(getContext());
-                String header = "CHP Name," +
-                        "CHP Phone," +
-                        "CHP UUID," +
+                String header = "CHP Phone," +
+                        "Reference Id," +
                         "Country," +
-                        "Record UUID," +
+                        "Date Added," +
                         "Record LAT," +
                         "Record LON," +
-                        "Added By," +
-                        "Phone," +
-                        "Email," +
-                        "Date Added";
+                        "GPS On?," +
+                        "Activity Type," +
+                        "Time to Resolve";
                 printWriter.println(header);
                 for (GpsData gpsData : gpsDatas){
-                    String strData = gpsData.getChpName() +","+
-                            gpsData.getChpPhone() +","+
-                            gpsData.getChpUuid() +","+
+                    String strData = gpsData.getChpPhone() +","+
+                            gpsData.getReferenceId() +","+
                             gpsData.getCountry() +","+
-                            gpsData.getChpRecorduuid() +","+
+                            new DisplayDate(gpsData.getDateAdded()).dateAndTime() +","+
                             gpsData.getLatitude() +","+
                             gpsData.getLongitude() +","+
-                            gpsData.getSupervisorName() +","+
-                            gpsData.getSupervisoPhone() +","+
-                            gpsData.getSupervisorEmail() + ","+
-                            new DisplayDate(gpsData.getDateAdded()).dateAndTime();
+                            (gpsData.isGpsOn() ? "Yes" : "No") +","+
+                            gpsData.getActivityType() +","+
+                            gpsData.getApproximateTimeToResolve();
                     printWriter.println(strData);
                 }
             } catch (Exception e){

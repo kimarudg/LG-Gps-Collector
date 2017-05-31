@@ -36,34 +36,30 @@ public class GpsDataTable extends SQLiteOpenHelper {
     public static String text_field = " text ";
 
     public static final String UUID= "id";
-    public static final String SUPERVISOR_NAME= "supervisor_name";
-    public static final String SUPERVISOR_EMAIL = "supervisor_email";
-    public static final String SUPERVISOR_PHONE = "supervisor_phone";
-    public static final String CHP_NAME = "chp_name";
     public static final String CHP_PHONE = "chp_phone";
-    public static final String CHP_UUID = "chp_uuid";
-    public static final String RECORD_UUID = "record_uuid";
+    public static final String REFERENCE_ID = "record_uuid";
     public static final String COUNTRY = "country";
     public static final String DATE_ADDED = "client_time";
     public static final String LATITUDE = "lat";
     public static final String LONGITUDE = "lon";
+    public static final String GPS_ON = "gps_on";
+    public static final String ACTIVITY_TYPE = "activity_type";
+    public static final String TIME_TO_RESOLVE = "time_to_resolve";
 
-    String [] columns=new String[]{UUID, SUPERVISOR_NAME, SUPERVISOR_EMAIL, SUPERVISOR_PHONE,
-            CHP_NAME, CHP_PHONE, CHP_UUID, RECORD_UUID, COUNTRY, DATE_ADDED, LATITUDE, LONGITUDE};
+    String [] columns=new String[]{UUID, CHP_PHONE, REFERENCE_ID, COUNTRY, DATE_ADDED,
+            LATITUDE, LONGITUDE, GPS_ON, ACTIVITY_TYPE, TIME_TO_RESOLVE};
 
     public static final String CREATE_DATABASE="CREATE TABLE " + TABLE_NAME + "("
             + UUID + varchar_field + ", "
-            + SUPERVISOR_NAME + varchar_field + ", "
-            + SUPERVISOR_PHONE + varchar_field + ", "
-            + SUPERVISOR_EMAIL + varchar_field + ", "
-            + CHP_NAME + varchar_field + ", "
             + CHP_PHONE + varchar_field + ", "
-            + CHP_UUID + varchar_field + ", "
-            + RECORD_UUID + varchar_field + ", "
-            + COUNTRY + text_field + ", "
+            + REFERENCE_ID + varchar_field + ", "
+            + COUNTRY + varchar_field + ", "
             + DATE_ADDED + real_field + ", "
             + LATITUDE + real_field + ", "
-            + LONGITUDE + real_field + "); ";
+            + LONGITUDE + real_field + ", "
+            + GPS_ON + integer_field + ", "
+            + ACTIVITY_TYPE + varchar_field + ", "
+            + TIME_TO_RESOLVE + varchar_field + "); ";
 
     public static final String DATABASE_DROP="DROP TABLE IF EXISTS" + TABLE_NAME;
 
@@ -93,17 +89,15 @@ public class GpsDataTable extends SQLiteOpenHelper {
         SQLiteDatabase db=getWritableDatabase();
         ContentValues cv=new ContentValues();
         cv.put(UUID, gpsData.getUuid());
-        cv.put(SUPERVISOR_EMAIL, gpsData.getSupervisorEmail());
-        cv.put(SUPERVISOR_NAME, gpsData.getSupervisorName());
-        cv.put(SUPERVISOR_PHONE, gpsData.getSupervisoPhone());
-        cv.put(CHP_NAME, gpsData.getChpName());
         cv.put(CHP_PHONE, gpsData.getChpPhone());
-        cv.put(CHP_UUID, gpsData.getChpUuid());
-        cv.put(RECORD_UUID, gpsData.getChpRecorduuid());
+        cv.put(REFERENCE_ID, gpsData.getReferenceId());
         cv.put(COUNTRY, gpsData.getCountry());
         cv.put(DATE_ADDED, gpsData.getDateAdded());
         cv.put(LATITUDE, gpsData.getLatitude());
         cv.put(LONGITUDE, gpsData.getLongitude());
+        cv.put(GPS_ON, gpsData.isGpsOn());
+        cv.put(ACTIVITY_TYPE, gpsData.getActivityType());
+        cv.put(TIME_TO_RESOLVE, gpsData.getApproximateTimeToResolve());
 
 
         long id;
@@ -132,17 +126,15 @@ public class GpsDataTable extends SQLiteOpenHelper {
             GpsData gpsData=new GpsData();
 
             gpsData.setUuid(cursor.getString(0));
-            gpsData.setSupervisorName(cursor.getString(1));
-            gpsData.setSupervisorEmail(cursor.getString(2));
-            gpsData.setSupervisoPhone(cursor.getString(3));
-            gpsData.setChpName(cursor.getString(4));
-            gpsData.setChpPhone(cursor.getString(5));
-            gpsData.setChpUuid(cursor.getString(6));
-            gpsData.setChpRecorduuid(cursor.getString(7));
-            gpsData.setCountry(cursor.getString(8));
-            gpsData.setDateAdded(cursor.getLong(9));
-            gpsData.setLatitude(cursor.getDouble(10));
-            gpsData.setLongitude(cursor.getDouble(11));
+            gpsData.setChpPhone(cursor.getString(1));
+            gpsData.setReferenceId(cursor.getString(2));
+            gpsData.setCountry(cursor.getString(3));
+            gpsData.setDateAdded(cursor.getLong(4));
+            gpsData.setLatitude(cursor.getDouble(5));
+            gpsData.setLongitude(cursor.getDouble(6));
+            gpsData.setGpsOn(cursor.getInt(7) == 1);
+            gpsData.setActivityType(cursor.getString(8));
+            gpsData.setApproximateTimeToResolve(cursor.getString(9));
 
             gpsDataList.add(gpsData);
         }
@@ -166,23 +158,57 @@ public class GpsDataTable extends SQLiteOpenHelper {
         }else{
             GpsData gpsData=new GpsData();
             gpsData.setUuid(cursor.getString(0));
-            gpsData.setSupervisorName(cursor.getString(1));
-            gpsData.setSupervisorEmail(cursor.getString(2));
-            gpsData.setSupervisoPhone(cursor.getString(3));
-            gpsData.setChpName(cursor.getString(4));
-            gpsData.setChpPhone(cursor.getString(5));
-            gpsData.setChpUuid(cursor.getString(6));
-            gpsData.setChpRecorduuid(cursor.getString(7));
-            gpsData.setCountry(cursor.getString(8));
-            gpsData.setDateAdded(cursor.getLong(9));
-            gpsData.setLatitude(cursor.getDouble(10));
-            gpsData.setLatitude(cursor.getDouble(11));
+            gpsData.setChpPhone(cursor.getString(1));
+            gpsData.setReferenceId(cursor.getString(2));
+            gpsData.setCountry(cursor.getString(3));
+            gpsData.setDateAdded(cursor.getLong(4));
+            gpsData.setLatitude(cursor.getDouble(5));
+            gpsData.setLongitude(cursor.getDouble(6));
+            gpsData.setGpsOn(cursor.getInt(7) == 1);
+            gpsData.setActivityType(cursor.getString(8));
+            gpsData.setApproximateTimeToResolve(cursor.getString(9));
             return gpsData;
         }
 
     }
 
+    public JSONObject getGpsDataAsJson() {
 
+        SQLiteDatabase db=getReadableDatabase();
+
+        Cursor cursor=db.query(TABLE_NAME,columns, null, null,null,null,null,null);
+
+        JSONObject results = new JSONObject();
+
+        JSONArray resultSet = new JSONArray();
+
+        for (cursor.moveToFirst(); !cursor.isAfterLast();cursor.moveToNext()){
+            int totalColumns = cursor.getColumnCount();
+            JSONObject rowObject = new JSONObject();
+
+            for (int i =0; i < totalColumns; i++){
+                if (cursor.getColumnName(i) != null){
+                    try {
+                        if (cursor.getString(i) != null){
+                            rowObject.put(cursor.getColumnName(i), cursor.getString(i));
+                        }else{
+                            rowObject.put(cursor.getColumnName(i), "");
+                        }
+                    }catch (Exception e){
+                    }
+                }
+            }
+            resultSet.put(rowObject);
+            try {
+                results.put(JSON_ROOT, resultSet);
+            } catch (JSONException e) {
+
+            }
+        }
+        cursor.close();
+        db.close();
+        return results;
+    }
 
     public boolean isExist(GpsData gpsData) {
         SQLiteDatabase db = getReadableDatabase();

@@ -82,13 +82,13 @@ public class GpsDataViewFragment extends Fragment {
         supervisorPhone = (TextView) v.findViewById(R.id.supervisorPhone);
         gpsData = session.getSavedGpsData();
 
-        editUuid.setText(gpsData.getUuid());
+        editUuid.setText(gpsData.getReferenceId());
         editLocationData.setText("Lat: " +String.valueOf(gpsData.getLatitude()) + ",  Lon: " + String.valueOf(gpsData.getLongitude()));
-        chpName.setText(gpsData.getChpName());
+        chpName.setText(gpsData.getChpPhone());
         chpPhone.setText(gpsData.getChpPhone());
-        supervisorName.setText(gpsData.getSupervisorName());
-        supervisorEmail.setText(gpsData.getSupervisorEmail());
-        supervisorPhone.setText(gpsData.getSupervisoPhone());
+        supervisorName.setText(gpsData.getReferenceId());
+        supervisorEmail.setText(gpsData.isGpsOn() ? "GPS ON ": " GPS OFF");
+        supervisorPhone.setText(gpsData.getActivityType());
         return v;
     }
 }

@@ -89,17 +89,13 @@ public class GpsDataListAdapter extends RecyclerView.Adapter<GpsDataListAdapter.
         GpsData gpsData = gpsDatas.get(position);
 
         //// displaying text view data
-        holder.from.setText(gpsData.getChpName());
-        holder.subject.setText(gpsData.getChpRecorduuid());
+        holder.from.setText(gpsData.getChpPhone());
+        holder.subject.setText(gpsData.getActivityType());
         holder.message.setText(gpsData.getLatitude().toString());
         holder.timestamp.setText(String.valueOf(gpsData.getLongitude()));
 
-        // displaying the first letter of From in icon text
-        if (gpsData.getChpName().equals("") || gpsData.getChpName() == null){
-            holder.iconText.setText("LG");
-        }else{
-            holder.iconText.setText(gpsData.getChpName().substring(0,1));
-        }
+        holder.iconText.setText(String.valueOf(position));
+
 
 
         // change the row state to activated

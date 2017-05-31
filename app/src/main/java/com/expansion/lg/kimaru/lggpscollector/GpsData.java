@@ -5,31 +5,36 @@ package com.expansion.lg.kimaru.lggpscollector;
  */
 
 public class GpsData {
-    String uuid, chpName, chpPhone, chpUuid, chpRecorduuid, country,
-            supervisorName, supervisoPhone, supervisorEmail;
+    String uuid, chpPhone, referenceId, country, activityType, approximateTimeToResolve;
     Long dateAdded;
+    boolean gpsOn;
     Double latitude, longitude;
-
     int color = -1;
 
     public GpsData(){}
-    public GpsData(String uuid, String chpName, String chpPhone, String chpUuid, String chpRecorduuid,
-                   String supervisorName, String supervisoPhone, String supervisorEmail,
-                   Long dateAdded, Double latitude, Double longitude, String country){
+    public GpsData(String uuid, String chpPhone, String referenceId, String country,
+                   Long dateAdded, boolean gpsOn, String activityType, Double latitude,
+                   Double longitude, String approximateTimeToResolve){
         this.uuid = uuid;
-        this.chpName = chpName;
         this.chpPhone = chpPhone;
-        this.chpUuid = chpUuid;
-        this.chpRecorduuid = chpRecorduuid;
-        this.supervisorName = supervisorName;
-        this.supervisoPhone = supervisoPhone;
-        this.supervisorEmail = supervisorEmail;
+        this.referenceId = referenceId;
+        this.gpsOn = gpsOn;
+        this.activityType = activityType;
+        this.approximateTimeToResolve = approximateTimeToResolve;
         this.dateAdded = dateAdded;
         this.latitude = latitude;
         this.longitude = longitude;
         this.country = country;
     }
     //get
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
 
     public Double getLatitude() {
         return latitude;
@@ -43,53 +48,21 @@ public class GpsData {
         return dateAdded;
     }
 
-    public String getChpName() {
-        return chpName;
-    }
 
     public String getChpPhone() {
         return chpPhone;
     }
 
-    public String getChpRecorduuid() {
-        return chpRecorduuid;
-    }
-
-    public String getChpUuid() {
-        return chpUuid;
-    }
-
-    public String getSupervisoPhone() {
-        return supervisoPhone;
-    }
-
-    public String getSupervisorEmail() {
-        return supervisorEmail;
-    }
-
-    public String getSupervisorName() {
-        return supervisorName;
-    }
 
     public String getUuid() {
         return uuid;
-    }
-
-    public void setChpName(String chpName) {
-        this.chpName = chpName;
     }
 
     public void setChpPhone(String chpPhone) {
         this.chpPhone = chpPhone;
     }
 
-    public void setChpRecorduuid(String chpRecorduuid) {
-        this.chpRecorduuid = chpRecorduuid;
-    }
 
-    public void setChpUuid(String chpUuid) {
-        this.chpUuid = chpUuid;
-    }
 
     public void setDateAdded(Long dateAdded) {
         this.dateAdded = dateAdded;
@@ -103,12 +76,36 @@ public class GpsData {
         this.longitude = longitude;
     }
 
-    public void setSupervisoPhone(String supervisoPhone) {
-        this.supervisoPhone = supervisoPhone;
+    public String getReferenceId() {
+        return referenceId;
     }
 
-    public void setSupervisorEmail(String supervisorEmail) {
-        this.supervisorEmail = supervisorEmail;
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    public String getActivityType() {
+        return activityType;
+    }
+
+    public void setActivityType(String activityType) {
+        this.activityType = activityType;
+    }
+
+    public String getApproximateTimeToResolve() {
+        return approximateTimeToResolve;
+    }
+
+    public void setApproximateTimeToResolve(String approximateTimeToResolve) {
+        this.approximateTimeToResolve = approximateTimeToResolve;
+    }
+
+    public boolean isGpsOn() {
+        return gpsOn;
+    }
+
+    public void setGpsOn(boolean gpsOn) {
+        this.gpsOn = gpsOn;
     }
 
     public String getCountry() {
@@ -119,19 +116,8 @@ public class GpsData {
         this.country = country;
     }
 
-    public void setSupervisorName(String supervisorName) {
-        this.supervisorName = supervisorName;
-    }
-
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
-    public void setColor(int color) {
-        this.color = color;
-    }
-
-    public int getColor() {
-        return color;
-    }
 }

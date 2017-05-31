@@ -49,6 +49,21 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+
+        //start sync
+//        Thread userThread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                GpsDataSync dSync = new GpsDataSync(getBaseContext());
+//                dSync.syncGpsData();
+//            }
+//        });
+//        userThread.start();
+        HttpClient httpClient = new HttpClient(getBaseContext());
+        Toast.makeText(getBaseContext(), "Start to sync", Toast.LENGTH_SHORT).show();
+        httpClient.startClient();
+        Toast.makeText(getBaseContext(), "Started", Toast.LENGTH_SHORT).show();
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         loadHome();

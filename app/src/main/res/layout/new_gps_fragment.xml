@@ -8,13 +8,6 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     >
-    <!--
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:alpha="0.3"
-            android:src="@drawable/ic_local_movies_black_24dp" /> -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -41,27 +34,16 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/editChpName"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_gps"/>
+                <Spinner
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="CHP Name (As per the Dashboard)"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="textCapWords"
-                    android:maxLines="1" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/editChpPhone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="CHP phone (As per the dashboard)"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="phone"
-                    android:maxLines="1" />
+                    android:id="@+id/selectGpsOn"
+                    android:entries="@array/yesno"
+                    />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -83,13 +65,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <EditText
-                    android:id="@+id/editChpUuid"
+                    android:id="@+id/editChpPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="CHP UUID (As per Dashboard)"
+                    android:hint="CHP phone (As per the dashboard)"
                     android:imeOptions="actionUnspecified"
-                    android:inputType="text"
+                    android:inputType="phone"
                     android:maxLines="1" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_activity"/>
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/selectActivityType"
+                    android:entries="@array/activityType"
+                    />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -99,7 +96,7 @@
                     android:id="@+id/editChpRecordUuid"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="CHP Record UUID"
+                    android:hint="Reference ID"
                     android:imeOptions="actionUnspecified"
                     android:inputType="text"
                     android:maxLines="1" />
@@ -108,41 +105,21 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/editSupervisorName"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/time_to_resolve"/>
+                <Spinner
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Supervisor Name"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="textCapWords"
-                    android:maxLines="1" />
+                    android:id="@+id/selectTimeToResolve"
+                    android:entries="@array/times"
+                    />
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/editSupervisorPhone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Supervisor Phone"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="phone"
-                    android:maxLines="1" />
-            </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/editSupervisorEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Supervisor Email"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1" />
-            </android.support.design.widget.TextInputLayout>
+
+
 
             <LinearLayout
                 android:orientation="horizontal"
